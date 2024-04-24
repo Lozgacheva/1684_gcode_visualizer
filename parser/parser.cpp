@@ -189,7 +189,6 @@ int Parser :: g2_command(QStringList& params, int& str_num, QString& str) {
     qreal angle1 = calc_angle(current_pos, center);
     qreal angle2 = calc_angle(new_pos, center);
     qreal r = qSqrt(qPow(current_pos.rx() - center.rx(), 2) + qPow(current_pos.ry() - center.ry(), 2));
-    qDebug() << angle1 << angle2;
         
     QPainterPath path;
     path.moveTo(new_pos);
@@ -292,12 +291,15 @@ int Parser :: g3_command(QStringList& params, int& str_num, QString& str) {
     QPainterPath path;
     path.moveTo(current_pos);
     qreal len;
+    qDebug() << new_pos;
+    qDebug() << angle1 << angle2;
     if(angle1 < angle2) {
-        len = angle1 - angle2;
+        len = angle2 - angle1;
     }
     else {
-        len = 360 - angle1 - angle2;
+        len = 360 - angle2 - angle1;
     }
+    qDebug() << len;
     path.arcTo(center.rx() - r, center.ry() - r, 2*r, 2*r, angle1, len);
     scene -> addPath(path, QPen(Qt::black));
     current_pos = new_pos;

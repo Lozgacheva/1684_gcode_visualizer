@@ -4,6 +4,14 @@
 #include <map>
 #include <QThread>
 
+
+int error_param(QString c, int str_num, QString str) {
+    qDebug() << "Wrong parameter " << c << " at line " << str_num + 1 << " : " << str;
+    return 0;
+}
+
+
+
 /*!
     \brief конструктор
     \param scene_inp виджет, на котором будет происходить отрисовка
@@ -28,30 +36,28 @@ int Parser :: g0_command(QStringList& params, int& str_num, QString& str) {
             if(!flag_x) {
                 if(params.at(i).length() > 1) {
                     new_pos.rx() = params.at(i).mid(1).toFloat();
+                    flag_x++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
         else if(params.at(i).at(0) == "Y") {
-            if(!flag_x) {
+            if(!flag_y) {
                 if(params.at(i).length() > 1) {
                     new_pos.ry() = -params.at(i).mid(1).toFloat();
+                    flag_y++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
     }
@@ -71,34 +77,31 @@ int Parser :: g1_command(QStringList& params, int& str_num, QString& str) {
     QPointF new_pos = current_pos;
     for(int i = 0; i < params.length(); i++) {
         if(params.at(i).at(0) == "X") {
-            
             if(!flag_x) {
                 if(params.at(i).length() > 1) {
                     new_pos.rx() = params.at(i).mid(1).toFloat();
+                    flag_x++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
         else if(params.at(i).at(0) == "Y") {
-            if(!flag_x) {
+            if(!flag_y) {
                 if(params.at(i).length() > 1) {
                     new_pos.ry() = -params.at(i).mid(1).toFloat();
+                    flag_y++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
     }
@@ -128,60 +131,56 @@ int Parser :: g2_command(QStringList& params, int& str_num, QString& str) {
             if(!flag_x) {
                 if(params.at(i).length() > 1) {
                     new_pos.rx() = params.at(i).mid(1).toFloat();
+                    flag_x++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
         else if(params.at(i).at(0) == "Y") {
-            if(!flag_x) {
+            if(!flag_y) {
                 if(params.at(i).length() > 1) {
                     new_pos.ry() = -params.at(i).mid(1).toFloat();
+                    flag_y;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
         else if(params.at(i).at(0) == "I") {
-            if(!flag_x) {
+            if(!flag_i) {
                 if(params.at(i).length() > 1) {
                     center.rx() += params.at(i).mid(1).toFloat();
+                    flag_i;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
         else if(params.at(i).at(0) == "J") {
-            if(!flag_x) {
+            if(!flag_j) {
                 if(params.at(i).length() > 1) {
                     center.ry() -= params.at(i).mid(1).toFloat();
+                    flag_j++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
     }
@@ -224,60 +223,56 @@ int Parser :: g3_command(QStringList& params, int& str_num, QString& str) {
             if(!flag_x) {
                 if(params.at(i).length() > 1) {
                     new_pos.rx() = params.at(i).mid(1).toFloat();
+                    flag_x++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
         else if(params.at(i).at(0) == "Y") {
-            if(!flag_x) {
+            if(!flag_y) {
                 if(params.at(i).length() > 1) {
                     new_pos.ry() = -params.at(i).mid(1).toFloat();
+                    flag_y++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
         else if(params.at(i).at(0) == "I") {
-            if(!flag_x) {
+            if(!flag_i) {
                 if(params.at(i).length() > 1) {
                     center.rx() += params.at(i).mid(1).toFloat();
+                    flag_i++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
         else if(params.at(i).at(0) == "J") {
-            if(!flag_x) {
+            if(!flag_j) {
                 if(params.at(i).length() > 1) {
                     center.ry() -= params.at(i).mid(1).toFloat();
+                    flag_j++;
                 }
                 else {
-                    qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                    return 0;
+                    return error_param(params.at(i), str_num, str);
                 }
             }
             else {
-                qDebug() << "Wrong parameter " << params.at(i) << " at line " << str_num + 1 << " : " << str;
-                return 0;
+                return error_param(params.at(i), str_num, str);
             }
         }
     }
@@ -291,15 +286,12 @@ int Parser :: g3_command(QStringList& params, int& str_num, QString& str) {
     QPainterPath path;
     path.moveTo(current_pos);
     qreal len;
-    qDebug() << new_pos;
-    qDebug() << angle1 << angle2;
     if(angle1 < angle2) {
         len = angle2 - angle1;
     }
     else {
         len = 360 - angle2 - angle1;
     }
-    qDebug() << len;
     path.arcTo(center.rx() - r, center.ry() - r, 2*r, 2*r, angle1, len);
     scene -> addPath(path, QPen(Qt::black));
     current_pos = new_pos;

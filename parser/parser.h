@@ -10,10 +10,12 @@ private:
 
     int x_temp;
     int y_temp;
+
+    qreal coef;
 public:
     Parser(QGraphicsScene* scene);
     bool open(QString&);
-    int parse();
+    int parse(qreal coef_inp);
     int parse_line(QString&, int&);
     int command_router(QString&, QStringList&, int&, QString&);
 

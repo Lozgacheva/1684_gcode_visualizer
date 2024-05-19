@@ -108,7 +108,7 @@ int Parser :: g1_command(QStringList& params, int& str_num, QString& str) {
     QPainterPath path;
     path.moveTo(current_pos);
     path.lineTo(new_pos);
-    scene -> addPath(path, QPen(Qt::black));
+    main_path.addPath(path);
     current_pos = new_pos;
     return 1;
 }
@@ -199,7 +199,7 @@ int Parser :: g2_command(QStringList& params, int& str_num, QString& str) {
         len = 360 + angle1 - angle2;
     }
     path.arcTo(center.rx() - r, center.ry() - r, 2*r, 2*r, angle2, len);
-    scene -> addPath(path, QPen(Qt::black));
+    main_path.addPath(path);
     current_pos = new_pos;
     return 1;
 }
@@ -293,7 +293,7 @@ int Parser :: g3_command(QStringList& params, int& str_num, QString& str) {
         len = 360 + angle2 - angle1;
     }
     path.arcTo(center.rx() - r, center.ry() - r, 2*r, 2*r, angle1, len);
-    scene -> addPath(path, QPen(Qt::black));
+    main_path.addPath(path);
     current_pos = new_pos;
     return 1;
 }
@@ -489,6 +489,7 @@ int Parser :: parse(qreal coef_inp) {
             return 0;
         }
     }
+    scene -> addPath(main_path, QPen(Qt::black));
     return 1;
 }
 

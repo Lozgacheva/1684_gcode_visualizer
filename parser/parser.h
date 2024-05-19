@@ -2,6 +2,7 @@ class Parser {
 private:
     QGraphicsScene* scene;
     QStringList contain;
+    QPainterPath main_path;
 
     QPointF current_pos;
     QString prev_com;
@@ -13,7 +14,7 @@ private:
 
     qreal coef;
 public:
-    Parser(QGraphicsScene* scene);
+    Parser(QGraphicsScene*);
     bool open(QString&);
     int parse(qreal coef_inp);
     int parse_line(QString&, int&);

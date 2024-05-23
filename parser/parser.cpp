@@ -1,32 +1,25 @@
 #include <QtWidgets>
 #include <QDebug>
 #include "parser.h"
-#include <map>
-#include <QThread>
-#include <sys/resource.h>
 
-int error_param(const QString& c, int& str_num, QString& str) {
-    qDebug() << "Wrong parameter " << c << " at line " << str_num + 1 << " : " << str;
+
+int Parser :: error_param(const QString& c, int& str_num, QString& str) {
+    qDebug() << "Something wrong with: " << c << " at line " << str_num + 1 << " : " << str;
     return 0;
 }
 
 
-
-/*!
-    \brief конструктор
-    \param scene_inp виджет, на котором будет происходить отрисовка
-*/
-Parser :: Parser(QGraphicsScene* scene_inp) {
-    scene = scene_inp;
+Parser :: Parser() {
     current_pos.rx() = 0;
     current_pos.rx() = 0;
 }
 
 
-/*!
-    \brief G0. Команда холостого хода
-    \param params параметры команды
-*/
+QPainterPath Parser :: get_path() {
+    return main_path;
+}
+
+
 int Parser :: g0_command(QStringList& params, int& str_num, QString& str) {
     int flag_x = 0;
     int flag_y = 0;
@@ -66,11 +59,6 @@ int Parser :: g0_command(QStringList& params, int& str_num, QString& str) {
 }
 
 
-
-/*!
-    \brief G1. Команда линейной интерполяции
-    \param params параметры команды
-*/
 int Parser :: g1_command(QStringList& params, int& str_num, QString& str) {
     int flag_x = 0;
     int flag_y = 0;
@@ -114,11 +102,6 @@ int Parser :: g1_command(QStringList& params, int& str_num, QString& str) {
 }
 
 
-
-/*!
-    \brief G2 круговая интерполяция по часовой стрелке
-    \param params параметры команды
-*/
 int Parser :: g2_command(QStringList& params, int& str_num, QString& str) {
     int flag_x = 0;
     int flag_y = 0;
@@ -190,7 +173,7 @@ int Parser :: g2_command(QStringList& params, int& str_num, QString& str) {
     qreal r = qSqrt(qPow(current_pos.rx() - center.rx(), 2) + qPow(current_pos.ry() - center.ry(), 2));
 
     QPainterPath path;
-    path.moveTo(new_pos);
+    path.moveTo(current_pos);
     qreal len;
     if(angle1 > angle2) {
         len = angle1 - angle2;
@@ -198,19 +181,13 @@ int Parser :: g2_command(QStringList& params, int& str_num, QString& str) {
     else {
         len = 360 + angle1 - angle2;
     }
-    path.arcTo(center.rx() - r, center.ry() - r, 2*r, 2*r, angle2, len);
+    path.arcTo(center.rx() - r, center.ry() - r, 2*r, 2*r, angle1, -len);
     main_path.addPath(path);
     current_pos = new_pos;
     return 1;
 }
 
 
-
-
-/*!
-    \brief G3 круговая интерполяция против часовой стрелки
-    \param params параметры команды
-*/
 int Parser :: g3_command(QStringList& params, int& str_num, QString& str) {
     int flag_x = 0;
     int flag_y = 0;
@@ -277,8 +254,6 @@ int Parser :: g3_command(QStringList& params, int& str_num, QString& str) {
         }
     }
 
-    //раасчет угла начала
-    //проекция начальной точки на линию параллельную x проходлящую через центр
     qreal angle1 = calc_angle(current_pos, center);
     qreal angle2 = calc_angle(new_pos, center);
     qreal r = qSqrt(qPow(current_pos.rx() - center.rx(), 2) + qPow(current_pos.ry() - center.ry(), 2));
@@ -297,9 +272,6 @@ int Parser :: g3_command(QStringList& params, int& str_num, QString& str) {
     current_pos = new_pos;
     return 1;
 }
-
-
-
 
 
 qreal Parser :: calc_angle(QPointF& current_pos, QPointF& center){
@@ -335,17 +307,14 @@ qreal Parser :: calc_angle(QPointF& current_pos, QPointF& center){
 }
 
 
-/*!
-    \brief маршрутизация команд
-    \param current_command команда g-code
-    \param params список параметров команды
-*/
 int Parser :: command_router(QString& current_command, QStringList& params, int& str_num, QString& str) {
     //если в строке не было команды, то взять команду из предыдущей строки
     if(current_command ==  "") {
         current_command = prev_command;
     }
-    //обработать ошибку, если в самой первой строке нет команды еще надо
+    if(current_command == "") {
+        return error_param("no command", str_num, str);    
+    }
     if(current_command == "G0" || current_command == "G00") {
         g0_command(params, str_num, str);
         prev_command = "G0";
@@ -366,19 +335,15 @@ int Parser :: command_router(QString& current_command, QStringList& params, int&
         prev_command = "G2";
         return 1;
     }
-    // qDebug() << "unknown command " << current_command << " at line " << str_num << " : " << str;
+    else {
+        //если команды current_command нет
+    }
     return 1;
 }
 
 
-
-/*!
-    \brief команда, считывающая цифры в строке и добавляющая их к команде G-Code
-*/
-int read_num(QString& current_command, QString& current_str, int& str_num, int& i, QString& str) {
-    //счетчик точек. если точек больше, чем 1 - ошибка
+int Parser :: read_num(QString& current_command, QString& current_str, int& str_num, int& i, QString& str) {
     int point_counter = 0;
-    //сохранить команду G + цифры после нее до первой не цифры
     for(int j = i+1; j <= current_str.length(); j++) {
         if(current_str.at(j) == "-" && j == i + 1) {
             current_command += current_str.at(j);
@@ -395,8 +360,6 @@ int read_num(QString& current_command, QString& current_str, int& str_num, int& 
             j = current_str.length();
         }
     }
-    //если больше чем 1 точка - ошибка
-    // qDebug() << i;
     if(point_counter > 1) {
         return error_param(current_command, str_num, str);
     }
@@ -404,17 +367,11 @@ int read_num(QString& current_command, QString& current_str, int& str_num, int& 
 }
 
 
-
-
-/*!
-    \brief парсер одной линии
-*/
 int Parser :: parse_line(QString& str, int& str_num) {
     QString current_str = str;
     current_str.replace(" ", "");
     QString current_command = "";
     QStringList params;
-    //проходимся по каждому символу в строке
     for(int i = 0; i < current_str.length(); i++) {
         if(current_str.at(i) == 'G') {
             if(i != 0) {
@@ -424,7 +381,6 @@ int Parser :: parse_line(QString& str, int& str_num) {
             }
             current_command = "G";
             params.clear();
-            //считать цифры после 'G'
             if(read_num(current_command, current_str, str_num, i, str) == 0) {
                 return 0;
             }
@@ -437,11 +393,9 @@ int Parser :: parse_line(QString& str, int& str_num) {
             }
             current_command = "";
             params.clear();
-            //считать цифры после 'M'
             if(read_num(current_command, current_str, str_num, i, str) == 0) {
                 return 0;
             }
-            //команду M дальше не обрабатываем, т.к. не влияет на результат визуализации
         }
         //парметры, которые игнорируются, т.к. для визуализатора не важны
         else if(current_str.at(i) == "E" ||
@@ -478,9 +432,6 @@ int Parser :: parse_line(QString& str, int& str_num) {
 }
 
 
-/*!
-    \brief команда, содержащая один цикл прохода по строкам файла g-code
-*/
 int Parser :: parse(qreal coef_inp) {
     coef = coef_inp;
     for(int str_i = 0; str_i < contain.length(); str_i++) {
@@ -489,15 +440,12 @@ int Parser :: parse(qreal coef_inp) {
             return 0;
         }
     }
-    scene -> addPath(main_path, QPen(Qt::black));
+    contain.clear();
     return 1;
 }
 
 
-/*!
-    \brief команда открытия и чтения g-code файла
-*/
-bool Parser :: open(QString& gcode_file){
+int Parser :: open(QString& gcode_file){
     QFile file(gcode_file);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
         while (!file.atEnd()){
@@ -506,12 +454,9 @@ bool Parser :: open(QString& gcode_file){
             file.close();
 
         }
-        // debug
-        // qDebug() << contain;
-        return true;
+        return 1;
       }
     else
-    // debug
     qDebug()<< "file not open";
-    return false;
+    return 0;
 }

@@ -71,7 +71,7 @@ scene.addItem(&m_actor);
 ```
 - создать таймер, анимацию, сдвиг для "главного актера" (размеры "главного актера" пополам) и запустить анимацию. Ниже выставлены рекомендуемые параметры для всех методов для файла orc.gc:
 ```c
-QTimeLine *timer = new QTimeLine(550000, &window.view);
+QTimeLine *timer = new QTimeLine(550000, &view);
 QGraphicsItemAnimation *animation = new QGraphicsItemAnimation(timer);
 timer->setEasingCurve(QEasingCurve::Linear);
 animation->setItem(&m_actor);
